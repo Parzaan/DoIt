@@ -40,7 +40,7 @@ export default function AuthModal({ isOpen, onClose }) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-10000 flex items-center justify-center p-4">
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
@@ -56,7 +56,7 @@ export default function AuthModal({ isOpen, onClose }) {
               <X size={20} />
             </button>
 
-            <h2 className="text-3xl font-black mb-2 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-black mb-2 bg-linear-to-r from-white to-slate-400 bg-clip-text text-transparent">
               {isSignUp ? 'Join the Club.' : 'Welcome Back.'}
             </h2>
             <p className="text-slate-400 text-sm mb-8">Precision productivity starts here.</p>

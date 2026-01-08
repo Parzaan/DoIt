@@ -38,7 +38,7 @@ export default function CustomCursor() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-[99999] mix-blend-difference"
+      className="fixed top-0 left-0 pointer-events-none z-99999 mix-blend-difference"
       style={{
         width: 0, height: 0,
         borderLeft: "8px solid transparent",
