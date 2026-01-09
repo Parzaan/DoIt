@@ -155,7 +155,7 @@ export default function App() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed inset-0 z-[10005] bg-[#0b0c14] flex items-center justify-center pointer-events-none"
+            className="fixed inset-0 z-10005 bg-[#0b0c14] flex items-center justify-center pointer-events-none"
           >
             <motion.div
               initial={{ scale: 1.5, opacity: 0 }}
@@ -170,6 +170,58 @@ export default function App() {
             >
               <Logo size={120} />
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showSearch && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="w-full max-w-xl overflow-hidden mb-6"
+          >
+            <div className="glass rounded-3xl p-4 space-y-4 border border-white/10">
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+                <input 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search tasks..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm outline-none focus:ring-1 focus:ring-cyan-500/50"
+                />
+              </div>
+
+              {/* Filter & Category Management */}
+              <div className="space-y-2">
+                <p className="text-[8px] uppercase tracking-widest text-slate-500 font-bold px-1">Filters & Categories</p>
+                <div className="flex flex-wrap gap-2">
+                  <button 
+                    onClick={() => setActiveFilter("All")}
+                    className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase border transition-all ${activeFilter === "All" ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-slate-400'}`}
+                  >
+                    All
+                  </button>
+                  {customCategories.map(cat => (
+                    <div key={cat} className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
+                      <button 
+                        onClick={() => setActiveFilter(cat)}
+                        className={`px-2 py-0.5 text-[10px] font-bold uppercase transition-all ${activeFilter === cat ? 'text-cyan-400' : 'text-slate-400'}`}
+                      >
+                        {cat}
+                      </button>
+                      {/* Delete Category Option (only for non-defaults) */}
+                      {!["Personal", "Work", "Urgent"].includes(cat) && (
+                        <button onClick={() => deleteCategory(cat)} className="text-slate-600 hover:text-red-400 px-1">
+                          <X size={10} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -195,7 +247,7 @@ export default function App() {
           <div>
             {user ? (
               <div className="flex items-center gap-2 bg-white/5 border border-white/10 p-1 rounded-full pl-3">
-                <span className="hidden sm:inline text-[10px] text-slate-400 font-bold uppercase truncate max-w-[80px]">{user.email.split('@')[0]}</span>
+                <span className="hidden sm:inline text-[10px] text-slate-400 font-bold uppercase truncate max-w-20">{user.email.split('@')[0]}</span>
                 <button onClick={() => supabase.auth.signOut()} className="bg-white/10 p-1.5 rounded-full hover:bg-red-500/20 text-slate-400 transition-all"><LogOut size={14}/></button>
               </div>
             ) : (
@@ -206,7 +258,7 @@ export default function App() {
           </div>
         </div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-xl glass rounded-[2rem] p-4 sm:p-6 md:p-8 space-y-5">
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-xl glass rounded-4xl p-4 sm:p-6 md:p-8 space-y-5">
           
           <div className="flex justify-between items-center gap-4">
             <div className="flex-1 space-y-1.5">
@@ -249,7 +301,7 @@ export default function App() {
             </div>
           </form>
 
-          <div className="relative min-h-[150px]">
+          <div className="relative min-h-37.5">
             {isTasksLoading ? (
               <div className="absolute inset-0 flex items-center justify-center"><div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" /></div>
             ) : (
