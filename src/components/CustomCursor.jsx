@@ -5,12 +5,24 @@ export default function CustomCursor() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
+  const [isTouch, setIsTouch] = useState(true); // Default to true for safety
 
   useEffect(() => {
+    // Precise detection: Only show if the device has a "fine" pointer (a mouse)
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)');
+    
+    const checkDevice = () => {
+      setIsTouch(!canHover.matches);
+    };
+
+    checkDevice();
+    
+    // If it's a touch device, don't even add the listeners
+    if (!canHover.matches) return;
+
     const moveCursor = (e) => setPosition({ x: e.clientX, y: e.clientY });
     
     const handleHover = (e) => {
-      // Logic for detection
       if (e.target.closest('button, input, a, .cursor-grab, [role="button"]')) {
         setIsHovered(true);
       } else {
@@ -36,9 +48,12 @@ export default function CustomCursor() {
     };
   }, []);
 
+  // If it's mobile or touch, return nothing
+  if (isTouch) return null;
+
   return (
     <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-99999 mix-blend-difference"
+      className="fixed top-0 left-0 pointer-events-none z-[99999] mix-blend-difference"
       style={{
         width: 0, height: 0,
         borderLeft: "8px solid transparent",
