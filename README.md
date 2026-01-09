@@ -1,16 +1,27 @@
-# React + Vite
+# DoIt. ⚡️
+**Precision Productivity for the Modern Era.**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DoIt. is a high-performance productivity dashboard built with a focus on aesthetics, speed, and seamless user experience. Featuring a glassmorphism interface and physics-based interactions.
 
-Currently, two official plugins are available:
+## ✨ Core Features
+- **Fluid Task Management**: Reorderable list via Framer Motion.
+- **Glassmorphism UI**: High-end dark aesthetic with real-time blur.
+- **Interactive Branding**: Custom reactive triangle cursor for desktop.
+- **Supabase Sync**: Real-time cloud database for member accounts.
+- **Precision Reports**: Automated PDF export with dark-theme styling.
+- **Gamification**: Celebratory confetti bursts on task completion.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📱 Mobile-First Design
+Optimized for all screen sizes. Custom touch-panning for categories and scaled-down iconography for small viewports.
 
-## React Compiler
+## 🛠 Tech Stack
+- **Frontend**: React.js & Vite
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **Backend**: Supabase (PostgreSQL & Auth)
+- **Reporting**: jsPDF & AutoTable
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Quick Start
+1. **Install Dependencies**: `npm install`
+2. **Setup Env**: Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to your `.env`.
+3. **Launch**: `npm run dev`
