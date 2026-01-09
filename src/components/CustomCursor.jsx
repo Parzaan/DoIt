@@ -5,24 +5,23 @@ export default function CustomCursor() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
-  const [isTouch, setIsTouch] = useState(true); // Default to true for safety
+  const [isVisible, setIsVisible] = useState(false); // Start hidden, reveal if desktop
 
   useEffect(() => {
-    // Precise detection: Only show if the device has a "fine" pointer (a mouse)
+    // This check is the "Gold Standard" for modern web dev
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)');
     
-    const checkDevice = () => {
-      setIsTouch(!canHover.matches);
-    };
+    // Set visibility based on device capability
+    setIsVisible(canHover.matches);
 
-    checkDevice();
-    
-    // If it's a touch device, don't even add the listeners
+    // If it's a touch device (no hover), stop right here
     if (!canHover.matches) return;
 
     const moveCursor = (e) => setPosition({ x: e.clientX, y: e.clientY });
     
     const handleHover = (e) => {
+      // Yes, we need the hover thing! It's what makes the triangle 
+      // glow cyan and rotate when you touch buttons.
       if (e.target.closest('button, input, a, .cursor-grab, [role="button"]')) {
         setIsHovered(true);
       } else {
@@ -48,8 +47,8 @@ export default function CustomCursor() {
     };
   }, []);
 
-  // If it's mobile or touch, return nothing
-  if (isTouch) return null;
+  // If it's mobile/tablet, we don't render at all
+  if (!isVisible) return null;
 
   return (
     <motion.div

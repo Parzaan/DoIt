@@ -7,6 +7,7 @@ import { supabase } from './lib/supabaseClient';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import confetti from 'canvas-confetti';
+import Logo from './components/Logo';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -136,17 +137,59 @@ export default function App() {
     (activeFilter === "All" || t.category === activeFilter)
   );
 
+  const [isLaunching, setIsLaunching] = useState(true);
+
+  useEffect(() => {
+    // Hide splash screen after 2 seconds
+    const timer = setTimeout(() => setIsLaunching(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       <CustomCursor />
+      {/* MOBILE SPLASH SCREEN */}
+      <AnimatePresence>
+        {isLaunching && (
+          <motion.div 
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-[10005] bg-[#0b0c14] flex items-center justify-center pointer-events-none"
+          >
+            <motion.div
+              initial={{ scale: 1.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ 
+                scale: 0.3, 
+                y: -window.innerHeight / 2.5, // Shrinks toward the header position
+                x: -window.innerWidth / 3, 
+                opacity: 0 
+              }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Logo size={120} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="min-h-screen flex flex-col items-center pt-6 pb-20 px-4 md:pt-16">
         <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
         {/* TOP BAR ACCOUNT SECTION - Kept at top as requested */}
         <div className="w-full max-w-xl flex justify-between items-center mb-6 md:mb-10 px-1">
-          <div className="flex flex-col">
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tighter bg-linear-to-b from-white to-slate-500 bg-clip-text text-transparent">DoIt.</h1>
-            <p className="text-slate-500 uppercase text-[8px] md:text-[10px] tracking-[0.2em]">Precision Productivity</p>
+          <div className="flex items-center gap-4">
+            {/* 1. Added the Logo Component here */}
+            <Logo size={36} /> 
+            
+            <div className="flex flex-col">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tighter bg-linear-to-b from-white to-slate-500 bg-clip-text text-transparent">
+                DoIt.
+              </h1>
+              <p className="text-slate-500 uppercase text-[7px] md:text-[10px] tracking-[0.15em] leading-none mt-1">
+                Precision Productivity
+              </p>
+            </div>
           </div>
           
           <div>
