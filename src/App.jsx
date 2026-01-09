@@ -47,11 +47,9 @@ export default function App() {
         setCustomCategories(["Personal", "Work", "Urgent"]);
         setTasks([
           { id: '1', text: "Complete a task", completed: false, category: "Work", position: 0 },
-          { id: '2', text: "Drag to reorder", completed: true, category: "Work", position: 1 },
-          { id: '3', text: "Try the search icon", completed: false, category: "Personal", position: 2 },
-          { id: '4', text: "Sign in to sync your tasks", completed: false, category: "Urgent", position: 3 },
-          { id: '5', text: "Try creating a new category", completed: false, category: "Personal", position: 4 },
-          { id: '6', text: "Download today's report", completed: false, category: "Urgent", position: 5 },
+          { id: '2', text: "Drag to reorder", completed: true, category: "Personal", position: 1 },
+          { id: '3', text: "Sign in to sync your tasks", completed: false, category: "Urgent", position: 2 },
+          { id: '4', text: "Download today's report", completed: false, category: "Urgent", position: 3 },
         ]);
       }
       setIsTasksLoading(false);
@@ -145,6 +143,13 @@ export default function App() {
     t.text.toLowerCase().includes(searchQuery.toLowerCase()) && 
     (activeFilter === "All" || t.category === activeFilter)
   );
+
+  const categoryColors = {
+    Urgent: "text-red-400 bg-red-400/10 border-red-400/20",
+    Work: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+    Personal: "text-emerald-400 bg-emerald-400/10 border-emerald-500/20",
+    Default: "text-slate-300 bg-slate-300/10 border-slate-300/30"  // Improved Grey/Silver
+  };
 
   return (
     <>
@@ -290,16 +295,53 @@ export default function App() {
               <Reorder.Group axis="y" values={tasks} onReorder={handleReorder} className="space-y-2.5">
                 <AnimatePresence mode="popLayout">
                   {filteredTasks.map((task) => (
-                    <Reorder.Item key={task.id} value={task} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.98 }} className="flex items-center justify-between bg-white/5 p-3.5 rounded-2xl border border-white/5 transition-all">
+                    <Reorder.Item key={task.id} value={task} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.98 }} className="task-item group flex items-center justify-between bg-white/5 p-3.5 sm:p-4 rounded-2xl border border-white/5 active:bg-white/10 transition-all isolate">
                       <div className="flex items-center gap-3 min-w-0">
                         <GripVertical size={14} className="text-slate-700 cursor-grab shrink-0" />
-                        <button onClick={() => toggleTask(task.id)} className={`${task.completed ? 'text-emerald-400' : 'text-slate-600'} shrink-0 relative`}>
-                          <motion.div whileTap={{ scale: 0.8 }}><CheckCircle size={18} /></motion.div>
-                          {task.completed && <motion.div initial={{ scale: 0 }} animate={{ scale: 1.5, opacity: 0 }} className="absolute inset-0 bg-emerald-400/50 rounded-full" />}
+                        <button 
+                          onClick={() => toggleTask(task.id)} 
+                          className={`shrink-0 relative transition-colors duration-300 ${
+                            task.completed ? 'text-emerald-400' : 'text-slate-700 hover:text-cyan-400'
+                          }`}
+                        >
+                          <motion.div 
+                            initial={{ scale: 1.1, rotate: 0 }} 
+                            whileHover={{ 
+                              scale: 1.4, 
+                              rotate: 12, // The mechanical "lean"
+                              transition: { type: "spring", stiffness: 400, damping: 12 } 
+                            }} 
+                            whileTap={{ 
+                              scale: 0.9, 
+                              rotate: 0 // Snaps straight on click
+                            }}
+                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                          >
+                            <CheckCircle 
+                              size={20} 
+                              className={task.completed ? "text-emerald-400" : ""} 
+                            /> 
+                          </motion.div>
+
+                          {/* Success Pulse Animation */}
+                          <AnimatePresence>
+                            {task.completed && (
+                              <motion.div 
+                                initial={{ scale: 0, opacity: 0.8 }} 
+                                animate={{ scale: 2.5, opacity: 0 }} 
+                                exit={{ opacity: 0 }}
+                                className="absolute inset-0 bg-emerald-400/50 rounded-full pointer-events-none" 
+                              />
+                            )}
+                          </AnimatePresence>
                         </button>
                         <div className="flex flex-col min-w-0">
                           <span className={`${task.completed ? 'line-through text-slate-500' : 'text-slate-200'} truncate text-xs sm:text-sm`}>{task.text}</span>
-                          <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">{task.category}</span>
+                          <div className="mt-1"> 
+                            <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${categoryColors[task.category] || categoryColors.Default}`}>
+                              {task.category}
+                            </span>
+                          </div>
                         </div>
                       </div>
                       <button onClick={() => deleteTask(task.id)} className="text-slate-700 hover:text-red-400 p-1"><Trash2 size={16} /></button>
