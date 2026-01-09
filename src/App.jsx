@@ -23,11 +23,16 @@ export default function App() {
   const [isCatModalOpen, setIsCatModalOpen] = useState(false);
   const [newCatName, setNewCatName] = useState("");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [isLaunching, setIsLaunching] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
-    return () => subscription.unsubscribe();
+    const timer = setTimeout(() => setIsLaunching(false), 2000);
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -41,8 +46,8 @@ export default function App() {
       } else {
         setCustomCategories(["Personal", "Work", "Urgent"]);
         setTasks([
-          { id: '1', text: "Drag the grip to reorder", completed: false, category: "Work", position: 0 },
-          { id: '2', text: "Try the search icon above", completed: true, category: "Personal", position: 1 },
+          { id: '1', text: "Drag to reorder", completed: false, category: "Work", position: 0 },
+          { id: '2', text: "Try search icon", completed: true, category: "Personal", position: 1 },
         ]);
       }
       setIsTasksLoading(false);
@@ -137,103 +142,37 @@ export default function App() {
     (activeFilter === "All" || t.category === activeFilter)
   );
 
-  const [isLaunching, setIsLaunching] = useState(true);
-
-  useEffect(() => {
-    // Hide splash screen after 2 seconds
-    const timer = setTimeout(() => setIsLaunching(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <>
       <CustomCursor />
-      {/* MOBILE SPLASH SCREEN */}
+      
+      {/* 1. SPLASH SCREEN (Z-Index fix to prevent popping behind search) */}
       <AnimatePresence>
         {isLaunching && (
           <motion.div 
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed inset-0 z-10005 bg-[#0b0c14] flex items-center justify-center pointer-events-none"
+            className="fixed inset-0 z-[100000] bg-[#0b0c14] flex items-center justify-center pointer-events-none"
           >
             <motion.div
               initial={{ scale: 1.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ 
-                scale: 0.3, 
-                y: -window.innerHeight / 2.5, // Shrinks toward the header position
-                x: -window.innerWidth / 3, 
-                opacity: 0 
-              }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.8, ease: "anticipate" }}
             >
               <Logo size={120} />
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-      <AnimatePresence>
-        {showSearch && (
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="w-full max-w-xl overflow-hidden mb-6"
-          >
-            <div className="glass rounded-3xl p-4 space-y-4 border border-white/10">
-              {/* Search Input */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-                <input 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search tasks..."
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm outline-none focus:ring-1 focus:ring-cyan-500/50"
-                />
-              </div>
 
-              {/* Filter & Category Management */}
-              <div className="space-y-2">
-                <p className="text-[8px] uppercase tracking-widest text-slate-500 font-bold px-1">Filters & Categories</p>
-                <div className="flex flex-wrap gap-2">
-                  <button 
-                    onClick={() => setActiveFilter("All")}
-                    className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase border transition-all ${activeFilter === "All" ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-slate-400'}`}
-                  >
-                    All
-                  </button>
-                  {customCategories.map(cat => (
-                    <div key={cat} className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
-                      <button 
-                        onClick={() => setActiveFilter(cat)}
-                        className={`px-2 py-0.5 text-[10px] font-bold uppercase transition-all ${activeFilter === cat ? 'text-cyan-400' : 'text-slate-400'}`}
-                      >
-                        {cat}
-                      </button>
-                      {/* Delete Category Option (only for non-defaults) */}
-                      {!["Personal", "Work", "Urgent"].includes(cat) && (
-                        <button onClick={() => deleteCategory(cat)} className="text-slate-600 hover:text-red-400 px-1">
-                          <X size={10} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       <div className="min-h-screen flex flex-col items-center pt-6 pb-20 px-4 md:pt-16">
         <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
-        {/* TOP BAR ACCOUNT SECTION - Kept at top as requested */}
+        {/* 2. HEADER SECTION */}
         <div className="w-full max-w-xl flex justify-between items-center mb-6 md:mb-10 px-1">
           <div className="flex items-center gap-4">
-            {/* 1. Added the Logo Component here */}
             <Logo size={36} /> 
-            
             <div className="flex flex-col">
               <h1 className="text-2xl sm:text-3xl font-black tracking-tighter bg-linear-to-b from-white to-slate-500 bg-clip-text text-transparent">
                 DoIt.
@@ -243,7 +182,6 @@ export default function App() {
               </p>
             </div>
           </div>
-          
           <div>
             {user ? (
               <div className="flex items-center gap-2 bg-white/5 border border-white/10 p-1 rounded-full pl-3">
@@ -258,8 +196,49 @@ export default function App() {
           </div>
         </div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-xl glass rounded-4xl p-4 sm:p-6 md:p-8 space-y-5">
-          
+        {/* 3. SEARCH & FILTER (Now properly positioned) */}
+        <div className="w-full max-w-xl isolate">
+          <AnimatePresence>
+            {showSearch && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0, y: -10 }}
+                animate={{ height: 'auto', opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: -10 }}
+                className="overflow-hidden mb-6"
+              >
+                <div className="glass rounded-3xl p-4 space-y-4 border border-white/10">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+                    <input 
+                      autoFocus
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search tasks..."
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm outline-none focus:ring-1 focus:ring-cyan-500/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[8px] uppercase tracking-widest text-slate-500 font-bold px-1">Filters</p>
+                    <div className="flex flex-wrap gap-2">
+                      <button onClick={() => setActiveFilter("All")} className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase border transition-all ${activeFilter === "All" ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-slate-400'}`}>All</button>
+                      {customCategories.map(cat => (
+                        <div key={cat} className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
+                          <button onClick={() => setActiveFilter(cat)} className={`px-2 py-0.5 text-[10px] font-bold uppercase transition-all ${activeFilter === cat ? 'text-cyan-400' : 'text-slate-400'}`}>{cat}</button>
+                          {!["Personal", "Work", "Urgent"].includes(cat) && (
+                            <button onClick={() => deleteCategory(cat)} className="text-slate-600 hover:text-red-400 px-1"><X size={10} /></button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* 4. MAIN CARD */}
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-xl glass rounded-[2.5rem] p-4 sm:p-6 md:p-8 space-y-5 isolate">
           <div className="flex justify-between items-center gap-4">
             <div className="flex-1 space-y-1.5">
               <div className="flex justify-between text-[8px] md:text-[10px] uppercase tracking-widest text-slate-500 font-bold px-1">
@@ -270,7 +249,6 @@ export default function App() {
                 <motion.div animate={{ width: `${tasks.length > 0 ? (tasks.filter(t => t.completed).length / tasks.length) * 100 : 0}%` }} className="h-full bg-cyan-500 shadow-[0_0_10px_#22d3ee]" />
               </div>
             </div>
-            
             <div className="flex gap-1.5">
               <AnimatePresence mode="wait">
                 {tasks.some(t => t.completed) && (
@@ -290,10 +268,10 @@ export default function App() {
 
           <form onSubmit={addTask} className="space-y-3">
             <div className="flex gap-2">
-              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="What's your next plan..." className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 sm:py-3.5 text-sm outline-none focus:ring-1 focus:ring-cyan-500/50 text-white" />
+              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Next plan..." className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-cyan-500/50" />
               <button type="submit" className="bg-white text-black p-3 rounded-2xl transition-transform hover:scale-105 active:scale-95"><Plus size={20} /></button>
             </div>
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 touch-pan-x">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
               {customCategories.map(cat => (
                 <button key={cat} type="button" onClick={() => setCategory(cat)} className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase border transition-all whitespace-nowrap ${category === cat ? 'bg-cyan-500/20 border-cyan-500 text-cyan-400' : 'bg-white/5 border-white/10 text-slate-500'}`}>{cat}</button>
               ))}
@@ -301,14 +279,14 @@ export default function App() {
             </div>
           </form>
 
-          <div className="relative min-h-37.5">
+          <div className="relative min-h-[150px]">
             {isTasksLoading ? (
               <div className="absolute inset-0 flex items-center justify-center"><div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" /></div>
             ) : (
               <Reorder.Group axis="y" values={tasks} onReorder={handleReorder} className="space-y-2.5">
                 <AnimatePresence mode="popLayout">
                   {filteredTasks.map((task) => (
-                    <Reorder.Item key={task.id} value={task} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.98 }} className="task-item flex items-center justify-between bg-white/5 p-3.5 sm:p-4 rounded-2xl border border-white/5 active:bg-white/10 transition-all">
+                    <Reorder.Item key={task.id} value={task} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.98 }} className="flex items-center justify-between bg-white/5 p-3.5 rounded-2xl border border-white/5 transition-all">
                       <div className="flex items-center gap-3 min-w-0">
                         <GripVertical size={14} className="text-slate-700 cursor-grab shrink-0" />
                         <button onClick={() => toggleTask(task.id)} className={`${task.completed ? 'text-emerald-400' : 'text-slate-600'} shrink-0 relative`}>
@@ -320,7 +298,7 @@ export default function App() {
                           <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">{task.category}</span>
                         </div>
                       </div>
-                      <button onClick={() => deleteTask(task.id)} className="text-slate-700 hover:text-red-400 transition-colors p-1"><Trash2 size={16} /></button>
+                      <button onClick={() => deleteTask(task.id)} className="text-slate-700 hover:text-red-400 p-1"><Trash2 size={16} /></button>
                     </Reorder.Item>
                   ))}
                 </AnimatePresence>
@@ -329,9 +307,28 @@ export default function App() {
           </div>
         </motion.div>
 
-        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => !user ? setIsAuthOpen(true) : exportToPDF()} className="mt-8 flex items-center gap-2 text-slate-600 hover:text-cyan-400 transition-colors text-[9px] font-bold uppercase tracking-[0.2em]">
+        {/* 5. FOOTER BUTTON */}
+        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => !user ? setIsAuthOpen(true) : exportToPDF()} className="mt-8 flex items-center gap-2 text-slate-600 hover:text-cyan-400 text-[9px] font-bold uppercase tracking-[0.2em]">
           <Download size={14} /> Daily Report (PDF)
         </motion.button>
+
+        {/* 6. MODALS */}
+        <AnimatePresence>
+          {isCatModalOpen && (
+            <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="glass p-6 rounded-[2rem] border border-white/10 w-full max-w-xs space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-white font-black uppercase text-xs tracking-widest">New Category</h3>
+                  <button onClick={() => setIsCatModalOpen(false)}><X size={16} className="text-slate-500" /></button>
+                </div>
+                <form onSubmit={handleCreateCategory} className="space-y-4">
+                  <input autoFocus value={newCatName} onChange={(e) => setNewCatName(e.target.value)} placeholder="Category Name..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-cyan-500" />
+                  <button type="submit" className="w-full bg-cyan-500 text-black py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">Create</button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );
