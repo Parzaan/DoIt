@@ -152,7 +152,7 @@ export default function App() {
           <motion.div 
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100000] bg-[#0b0c14] flex items-center justify-center pointer-events-none"
+            className="fixed inset-0 z-100000 bg-[#0b0c14] flex items-center justify-center pointer-events-none"
           >
             <motion.div
               initial={{ scale: 1.5, opacity: 0 }}
@@ -279,7 +279,7 @@ export default function App() {
             </div>
           </form>
 
-          <div className="relative min-h-[150px]">
+          <div className="relative min-h-37.5">
             {isTasksLoading ? (
               <div className="absolute inset-0 flex items-center justify-center"><div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" /></div>
             ) : (
@@ -315,8 +315,8 @@ export default function App() {
         {/* 6. MODALS */}
         <AnimatePresence>
           {isCatModalOpen && (
-            <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="glass p-6 rounded-[2rem] border border-white/10 w-full max-w-xs space-y-4">
+            <div className="fixed inset-0 z-100001 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="glass p-6 rounded-4xl border border-white/10 w-full max-w-xs space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-white font-black uppercase text-xs tracking-widest">New Category</h3>
                   <button onClick={() => setIsCatModalOpen(false)}><X size={16} className="text-slate-500" /></button>
