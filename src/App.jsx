@@ -46,8 +46,12 @@ export default function App() {
       } else {
         setCustomCategories(["Personal", "Work", "Urgent"]);
         setTasks([
-          { id: '1', text: "Drag to reorder", completed: false, category: "Work", position: 0 },
-          { id: '2', text: "Try search icon", completed: true, category: "Personal", position: 1 },
+          { id: '1', text: "Complete a task", completed: false, category: "Work", position: 0 },
+          { id: '2', text: "Drag to reorder", completed: true, category: "Work", position: 1 },
+          { id: '3', text: "Try the search icon", completed: false, category: "Personal", position: 2 },
+          { id: '4', text: "Sign in to sync your tasks", completed: false, category: "Urgent", position: 3 },
+          { id: '5', text: "Try creating a new category", completed: false, category: "Personal", position: 4 },
+          { id: '6', text: "Download today's report", completed: false, category: "Urgent", position: 5 },
         ]);
       }
       setIsTasksLoading(false);
@@ -268,7 +272,7 @@ export default function App() {
 
           <form onSubmit={addTask} className="space-y-3">
             <div className="flex gap-2">
-              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Next plan..." className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-cyan-500/50" />
+              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="What's your next plan..." className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-cyan-500/50" />
               <button type="submit" className="bg-white text-black p-3 rounded-2xl transition-transform hover:scale-105 active:scale-95"><Plus size={20} /></button>
             </div>
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
