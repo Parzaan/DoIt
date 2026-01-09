@@ -195,7 +195,7 @@ export default function App() {
 
           <form onSubmit={addTask} className="space-y-3">
             <div className="flex gap-2">
-              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Next priority..." className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 sm:py-3.5 text-sm outline-none focus:ring-1 focus:ring-cyan-500/50 text-white" />
+              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="What's your next plan..." className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 sm:py-3.5 text-sm outline-none focus:ring-1 focus:ring-cyan-500/50 text-white" />
               <button type="submit" className="bg-white text-black p-3 rounded-2xl transition-transform hover:scale-105 active:scale-95"><Plus size={20} /></button>
             </div>
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 touch-pan-x">
